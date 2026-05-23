@@ -29,7 +29,7 @@ Elige **GitHub.com** → **HTTPS** → inicia sesión en el navegador.
 ### 2. Crear el repositorio y subir la rama `edwin`
 
 ```powershell
-cd C:\2026\Universidad\saturday
+cd C:\2026\Universidad\SO\Sabadoo
 
 gh repo create sistema-ficheros-biblioteca --public --source=. --remote=origin --push
 ```
@@ -52,7 +52,7 @@ gh repo create biblioteca-so-edwin --public --source=. --remote=origin --push
 **Opción B — Desde la terminal**
 
 ```powershell
-cd C:\2026\Universidad\saturday
+cd C:\2026\Universidad\SO\Sabadoo
 npx vercel login
 npx vercel --prod
 ```
