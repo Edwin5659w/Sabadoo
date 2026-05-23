@@ -26,7 +26,7 @@ gh auth login
 
 Elige **GitHub.com** → **HTTPS** → inicia sesión en el navegador.
 
-### 2. Crear el repositorio y subir la rama `edwin`
+### 2. Crear el repositorio y subir a `main`
 
 ```powershell
 cd C:\2026\Universidad\SO\Sabadoo
