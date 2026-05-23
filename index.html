@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Ficheros — Biblioteca Universitaria Central</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon" aria-hidden="true">📚</span>
+      <div>
+        <strong>Sist. Ficheros</strong>
+        <small>SO — Proyecto Final</small>
+      </div>
+    </div>
+    <nav class="sidebar-nav" aria-label="Secciones">
+      <a href="#intro" class="nav-link active">Introducción</a>
+      <a href="#problema" class="nav-link">El problema</a>
+      <a href="#organizacion" class="nav-link">Organización</a>
+      <a href="#comparacion" class="nav-link">Comparación</a>
+      <a href="#bloques" class="nav-link">Bloques en disco</a>
+      <a href="#fat" class="nav-link">FAT</a>
+      <a href="#solucion" class="nav-link">Solución final</a>
+      <a href="#conclusiones" class="nav-link">Conclusiones</a>
+    </nav>
+    <button class="sidebar-toggle" id="menuToggle" type="button" aria-label="Abrir menú">
+      <span></span><span></span><span></span>
+    </button>
+  </aside>
+
+  <div class="overlay" id="overlay"></div>
+
+  <main id="main" class="main">
+    <header class="hero" id="intro">
+      <div class="hero-badge">Sistemas Operativos · Proyecto Final</div>
+      <h1>Sistema de Ficheros para la <span class="gradient-text">Biblioteca Universitaria Central</span></h1>
+      <p class="author-line">Edwin Yair Molina Cerón · ID <strong>408873</strong></p>
+      <p class="hero-lead">
+        Propuesta de cómo organizar y guardar el catálogo de una biblioteca grande:
+        qué opciones evaluamos, cuáles descartamos y cuál elegimos para que las
+        búsquedas sean rápidas aun con cientos de miles de libros.
+      </p>
+      <div class="hero-cta">
+        <a href="#problema" class="btn btn-primary">Ver el problema</a>
+        <a href="#solucion" class="btn btn-ghost">Ver la solución</a>
+      </div>
+    </header>
+
+    <section class="section" aria-labelledby="escenario-title">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <h2 id="escenario-title">El escenario</h2>
+        <p class="section-hint">La Biblioteca Universitaria Central y sus números reales</p>
+      </div>
+
+      <div class="scenario-grid">
+        <article class="stat-card" data-animate>
+          <div class="stat-icon">📖</div>
+          <div class="stat-value" data-count="500000">0</div>
+          <div class="stat-label">Libros en catálogo</div>
+        </article>
+        <article class="stat-card" data-animate>
+          <div class="stat-icon">👥</div>
+          <div class="stat-value" data-count="10000">0</div>
+          <div class="stat-label">Usuarios registrados</div>
+        </article>
+        <article class="stat-card highlight" data-animate>
+          <div class="stat-icon">🔍</div>
+          <div class="stat-value" data-count="5000">0</div>
+          <div class="stat-label">Búsquedas por ISBN al día</div>
+        </article>
+        <article class="stat-card highlight" data-animate>
+          <div class="stat-icon">✍️</div>
+          <div class="stat-value" data-count="2000">0</div>
+          <div class="stat-label">Búsquedas por autor o título al día</div>
+        </article>
+        <article class="stat-card" data-animate>
+          <div class="stat-icon">➕</div>
+          <div class="stat-value">~200</div>
+          <div class="stat-label">Libros nuevos cada semana</div>
+        </article>
+        <article class="stat-card" data-animate>
+          <div class="stat-icon">📊</div>
+          <div class="stat-value">1×</div>
+          <div class="stat-label">Listado alfabético al mes</div>
+        </article>
+      </div>
+
+      <div class="problem-pillars" data-animate>
+        <h3>¿Qué hay que resolver?</h3>
+        <div class="pillars">
+          <div class="pillar">
+            <span class="pillar-icon">⚡</span>
+            <strong>Velocidad</strong>
+            <p>Cada día hay miles de consultas. Si el sistema tarda, los estudiantes hacen fila y el personal no da abasto.</p>
+          </div>
+          <div class="pillar">
+            <span class="pillar-icon">📈</span>
+            <strong>Escalabilidad</strong>
+            <p>El catálogo no deja de crecer. La solución tiene que funcionar hoy y también dentro de unos años.</p>
+          </div>
+          <div class="pillar">
+            <span class="pillar-icon">🗂️</span>
+            <strong>Organización</strong>
+            <p>Se busca por ISBN, por autor y por título. No es lo mismo buscar un código exacto que un apellido o sacar un listado de la A a la Z.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="problema" aria-labelledby="problema-title">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <h2 id="problema-title">¿Por qué el diseño importa?</h2>
+        <p class="section-hint">Lo que pasa cuando el catálogo no está bien pensado</p>
+      </div>
+
+      <div class="insight-grid">
+        <article class="insight-card" data-animate>
+          <div class="insight-icon bad">🐌</div>
+          <h3>Un mal diseño se vuelve lento</h3>
+          <p>Si todos los libros están guardados uno detrás de otro, buscar un ISBN puede obligar a revisar registro por registro. Con medio millón de libros y 5 000 búsquedas al día, eso ya no es viable.</p>
+          <span class="tag tag-bad">Demasiado lento</span>
+        </article>
+        <article class="insight-card" data-animate>
+          <div class="insight-icon warn">🔥</div>
+          <h3>Muchas búsquedas a la vez</h3>
+          <p>En horas pico mucha gente consulta al mismo tiempo. Sin una buena forma de localizar datos, el sistema tardaría demasiado en encontrar la información.</p>
+          <span class="tag tag-warn">Colapsa en horas pico</span>
+        </article>
+        <article class="insight-card" data-animate>
+          <div class="insight-icon accent">💾</div>
+          <h3>También importa cómo se guarda en disco</h3>
+          <p>No solo importa <em>cómo</em> ordenamos el catálogo, sino <em>dónde</em> quedan los bloques en el disco. Eso afecta si el archivo puede crecer, si se desperdicia espacio y qué tan rápido se lee.</p>
+          <span class="tag tag-good">Dos decisiones: catálogo + disco</span>
+        </article>
+      </div>
+
+      <p class="section-summary" data-animate>
+        En resumen: tenemos muchos datos, muchas consultas diarias y un catálogo que sigue creciendo.
+        Hace falta una forma rápida de buscar y una forma práctica de guardar los archivos en disco.
+      </p>
+    </section>
+
+    <section class="section" id="organizacion" aria-labelledby="org-title">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <h2 id="org-title">Cómo organizar el catálogo</h2>
+        <p class="section-hint">Tres modelos que analizamos para guardar los libros</p>
+      </div>
+
+      <article class="org-card rejected" data-animate>
+        <header class="org-header">
+          <div>
+            <span class="org-type">Opción A</span>
+            <h3>Archivo secuencial</h3>
+          </div>
+          <span class="verdict verdict-no">No elegido</span>
+        </header>
+
+        <div class="org-body">
+          <div class="org-text">
+            <p>Los libros se guardan en el orden en que llegan, como una lista larga. Para encontrar uno hay que ir revisando desde el principio hasta dar con el ISBN.</p>
+            <h4>En la práctica</h4>
+            <ul class="compact-list">
+              <li>Se lee el archivo de principio a fin</li>
+              <li>Los libros nuevos suelen ir al final</li>
+              <li>Cada búsqueda puede recorrer muchísimos registros</li>
+            </ul>
+            <div class="pros-cons">
+              <div><strong>Ventajas</strong><ul><li>Fácil de entender e implementar</li><li>Sirve si solo necesitas leer todo de corrido</li></ul></div>
+              <div><strong>Desventajas</strong><ul><li>Muy lento con 500 000 libros</li><li>No sirve para miles de consultas diarias</li></ul></div>
+            </div>
+            <p class="library-link"><strong>En la biblioteca:</strong> con 5 000 búsquedas por ISBN al día, el personal y los usuarios esperarían demasiado.</p>
+          </div>
+          <div class="diagram-box">
+            <p class="diagram-label">Registros en disco</p>
+            <div class="seq-diagram">
+              <div class="block">Libro 1</div>
+              <span class="arrow">→</span>
+              <div class="block">Libro 2</div>
+              <span class="arrow">→</span>
+              <div class="block">Libro 3</div>
+              <span class="arrow">→</span>
+              <div class="block dim">… 500k</div>
+            </div>
+            <p class="diagram-note">Buscar un ISBN = recorrer casi toda la lista</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="org-card partial" data-animate>
+        <header class="org-header">
+          <div>
+            <span class="org-type">Opción B</span>
+            <h3>Organización por Hash</h3>
+          </div>
+          <span class="verdict verdict-partial">Solo parcial</span>
+        </header>
+
+        <div class="org-body">
+          <div class="org-text">
+            <p>El ISBN se convierte con una función hash en una posición del disco. Si conoces el ISBN exacto, llegas casi directo al bloque donde está el libro.</p>
+            <h4>En la práctica</h4>
+            <ul class="compact-list">
+              <li>Muy bueno para búsquedas exactas por ISBN</li>
+              <li>Encuentra un libro concreto en pocos pasos</li>
+              <li>No mantiene un orden alfabético útil</li>
+            </ul>
+            <div class="pros-cons">
+              <div><strong>Ventajas</strong><ul><li>Rápido para préstamos por ISBN</li><li>Ideal cuando la clave es exacta</li></ul></div>
+              <div><strong>Desventajas</strong><ul><li>No ayuda a listar de la A a la Z</li><li>Mal para buscar solo parte del autor o título</li></ul></div>
+            </div>
+            <p class="library-link"><strong>En la biblioteca:</strong> resuelve bien el ISBN, pero no cubre las 2 000 búsquedas por autor/título ni el informe mensual ordenado.</p>
+          </div>
+          <div class="diagram-box">
+            <p class="diagram-label">Flujo hash</p>
+            <div class="hash-diagram">
+              <div class="hash-input">ISBN<br><small>978-84-…</small></div>
+              <span class="arrow down">↓</span>
+              <div class="hash-fn">Función hash</div>
+              <span class="arrow down">↓</span>
+              <div class="block accent">Bloque 42</div>
+            </div>
+            <p class="diagram-note">Va directo al dato, pero sin orden alfabético</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="org-card chosen" data-animate>
+        <header class="org-header">
+          <div>
+            <span class="org-type">Opción C</span>
+            <h3>Árbol B+</h3>
+          </div>
+          <span class="verdict verdict-yes">✓ Elegido</span>
+        </header>
+
+        <div class="org-body">
+          <div class="org-text">
+            <p>Es como un índice ordenado en forma de árbol. Los datos quedan organizados y las hojas del árbol están enlazadas entre sí, así se puede recorrer el catálogo en orden sin revisar todo el archivo.</p>
+            <h4>En la práctica</h4>
+            <ul class="compact-list">
+              <li>Encuentra un ISBN, autor o título sin recorrer toda la lista</li>
+              <li>Mantiene el orden alfabético para informes y listados</li>
+              <li>Aguanta el crecimiento del catálogo sin volverse inmanejable</li>
+              <li>Los libros nuevos de cada semana se integran sin rehacer todo el sistema</li>
+            </ul>
+            <div class="pros-cons">
+              <div><strong>Ventajas</strong><ul><li>Rápido para búsquedas exactas y por rango</li><li>Perfecto para el informe mensual A–Z</li><li>Escala bien con muchos libros</li></ul></div>
+              <div><strong>Desventajas</strong><ul><li>Más trabajo de implementación que el secuencial</li><li>Puede hacer falta un índice por cada tipo de búsqueda</li></ul></div>
+            </div>
+            <p class="library-link"><strong>En la biblioteca:</strong> cubre las 5 000 búsquedas por ISBN, las 2 000 por autor/título y el listado alfabético mensual en un solo enfoque.</p>
+          </div>
+          <div class="diagram-box">
+            <p class="diagram-label">Árbol B+ (simplificado)</p>
+            <div class="btree-diagram">
+              <div class="btree-level">
+                <div class="btree-node root">M</div>
+              </div>
+              <div class="btree-level">
+                <div class="btree-node">D · G</div>
+                <div class="btree-node">P · T</div>
+              </div>
+              <div class="btree-level leaves">
+                <div class="btree-leaf">A C D</div>
+                <div class="btree-leaf">F G K</div>
+                <div class="btree-leaf">M N P</div>
+                <div class="btree-leaf">R T Z</div>
+              </div>
+              <div class="leaf-chain">
+                <span>↔ hojas enlazadas en orden ↔</span>
+              </div>
+            </div>
+            <p class="diagram-note">De la A a la Z sin revisar los 500 000 libros uno por uno</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="section section-alt" id="comparacion" aria-labelledby="cmp-title">
+      <div class="section-header">
+        <span class="section-num">04</span>
+        <h2 id="cmp-title">Comparación entre las tres opciones</h2>
+        <p class="section-hint">Resumen para ver de un vistazo cuál conviene más</p>
+      </div>
+
+      <div class="table-wrap" data-animate>
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Criterio</th>
+              <th>Secuencial</th>
+              <th>Hash</th>
+              <th class="col-best">Árbol B+</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Velocidad al buscar</td>
+              <td><span class="rating bad">Baja</span></td>
+              <td><span class="rating good">Alta (ISBN exacto)</span></td>
+              <td><span class="rating good">Alta</span></td>
+            </tr>
+            <tr>
+              <td>Cuando el catálogo crece</td>
+              <td><span class="rating bad">Empeora mucho</span></td>
+              <td><span class="rating mid">Regular</span></td>
+              <td><span class="rating good">Se mantiene bien</span></td>
+            </tr>
+            <tr>
+              <td>Búsqueda por ISBN exacto</td>
+              <td><span class="rating bad">Muy lenta</span></td>
+              <td><span class="rating good">Muy rápida</span></td>
+              <td><span class="rating good">Rápida</span></td>
+            </tr>
+            <tr>
+              <td>Búsqueda alfabética / listados</td>
+              <td><span class="rating mid">Solo si ya está ordenado</span></td>
+              <td><span class="rating bad">No sirve</span></td>
+              <td><span class="rating good">Sí, muy bien</span></td>
+            </tr>
+            <tr>
+              <td>Dificultad de implementar</td>
+              <td><span class="rating good">Baja</span></td>
+              <td><span class="rating mid">Media</span></td>
+              <td><span class="rating mid">Media</span></td>
+            </tr>
+            <tr>
+              <td>¿Sirve para la biblioteca?</td>
+              <td><span class="rating bad">No</span></td>
+              <td><span class="rating mid">Solo en parte</span></td>
+              <td><span class="rating good">Sí</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" id="bloques" aria-labelledby="bloques-title">
+      <div class="section-header">
+        <span class="section-num">05</span>
+        <h2 id="bloques-title">Cómo se guardan los bloques en disco</h2>
+        <p class="section-hint">Además del catálogo, hay que decidir cómo ocupar el espacio en disco</p>
+      </div>
+
+      <div class="block-methods">
+        <article class="block-card" data-animate>
+          <h3>Asignación contigua</h3>
+          <p>Los bloques del archivo quedan juntos, uno tras otro, como cajones seguidos en un estante.</p>
+          <div class="diagram-box small">
+            <div class="contig-diagram">
+              <div class="disk-block filled">B1</div>
+              <div class="disk-block filled">B2</div>
+              <div class="disk-block filled">B3</div>
+              <div class="disk-block filled">B4</div>
+            </div>
+          </div>
+          <ul class="mini-list pros"><li>✓ Muy rápido para leer seguido</li></ul>
+          <ul class="mini-list cons"><li>✗ Se desperdicia espacio entre archivos</li><li>✗ Cuesta agrandar el archivo si ya no hay hueco libre al lado</li></ul>
+          <p class="library-link"><strong>En la biblioteca:</strong> con ~200 libros nuevos cada semana, hacer difícil agrandar el archivo no es práctico.</p>
+        </article>
+
+        <article class="block-card" data-animate>
+          <h3>Asignación encadenada</h3>
+          <p>Cada bloque indica cuál es el siguiente. No tienen que estar juntos en el disco.</p>
+          <div class="diagram-box small">
+            <div class="chain-diagram">
+              <div class="disk-block filled">B1</div>
+              <span class="arrow">→</span>
+              <div class="disk-block filled">B7</div>
+              <span class="arrow">→</span>
+              <div class="disk-block filled">B15</div>
+              <span class="arrow">→</span>
+              <div class="disk-block null">∅</div>
+            </div>
+          </div>
+          <ul class="mini-list pros"><li>✓ El archivo puede crecer con más bloques</li><li>✓ Aprovecha mejor los huecos del disco</li></ul>
+          <ul class="mini-list cons"><li>✗ Para ir a un bloque concreto hay que seguir la cadena</li><li>✗ Cada bloque guarda un puntero extra</li></ul>
+          <p class="library-link"><strong>En la biblioteca:</strong> con tantas búsquedas sueltas por ISBN, ir bloque por bloque hace todo más lento.</p>
+        </article>
+
+        <article class="block-card chosen-block" data-animate>
+          <div class="chosen-ribbon">Elegida</div>
+          <h3>Asignación indexada</h3>
+          <p>Hay un bloque índice que dice en qué bloques del disco está guardado cada parte del archivo.</p>
+          <div class="diagram-box small">
+            <div class="index-diagram">
+              <div class="index-node">Índice</div>
+              <div class="index-pointers">
+                <span>→ B2</span>
+                <span>→ B9</span>
+                <span>→ B20</span>
+              </div>
+              <div class="index-data">
+                <div class="disk-block filled">B2</div>
+                <div class="disk-block filled">B9</div>
+                <div class="disk-block filled">B20</div>
+              </div>
+            </div>
+          </div>
+          <ul class="mini-list pros"><li>✓ Se llega a un bloque concreto mirando el índice</li><li>✓ El archivo puede crecer sin estar todo junto</li></ul>
+          <ul class="mini-list cons"><li>✗ El bloque índice puede hacerse grande si el archivo crece mucho</li></ul>
+          <p class="library-link"><strong>En la biblioteca:</strong> permite encontrar datos rápido y seguir agregando libros cada semana sin reorganizar todo el disco.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section section-alt" id="fat" aria-labelledby="fat-title">
+      <div class="section-header">
+        <span class="section-num">06</span>
+        <h2 id="fat-title">FAT — Tabla de asignación de archivos</h2>
+        <p class="section-hint">La tabla que indica qué bloque sigue a cuál</p>
+      </div>
+
+      <div class="fat-grid">
+        <div class="fat-explain" data-animate>
+          <div class="fat-cards">
+            <div class="fat-point">
+              <span>📋</span>
+              <div>
+                <strong>Qué es</strong>
+                <p>Una tabla donde cada fila representa un bloque del disco y dice qué hay ahí.</p>
+              </div>
+            </div>
+            <div class="fat-point">
+              <span>🔗</span>
+              <div>
+                <strong>Para qué sirve</strong>
+                <p>Indica cuál es el siguiente bloque de un archivo o si ese bloque está libre.</p>
+              </div>
+            </div>
+            <div class="fat-point">
+              <span>🗃️</span>
+              <div>
+                <strong>Qué guarda</strong>
+                <p>El número del siguiente bloque, si el archivo terminó (fin de archivo) o si el bloque no se usa.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="fat-visual" data-animate>
+          <p class="diagram-label">Ejemplo simplificado</p>
+          <table class="fat-table">
+            <thead>
+              <tr><th>Bloque</th><th>Entrada FAT</th><th>Estado</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>0</td><td>—</td><td class="free">Libre</td></tr>
+              <tr><td>1</td><td>3</td><td class="used">Archivo A</td></tr>
+              <tr><td>2</td><td>5</td><td class="used">Archivo B</td></tr>
+              <tr><td>3</td><td>7</td><td class="used">Archivo A</td></tr>
+              <tr><td>4</td><td>Fin</td><td class="used">Archivo C</td></tr>
+              <tr><td>5</td><td>Fin</td><td class="used">Archivo B</td></tr>
+              <tr><td>6</td><td>—</td><td class="free">Libre</td></tr>
+              <tr><td>7</td><td>Fin</td><td class="used">Archivo A</td></tr>
+            </tbody>
+          </table>
+          <div class="fat-chain-visual">
+            <span>Archivo A en disco:</span>
+            <div class="chain-diagram compact">
+              <div class="disk-block filled">1</div><span>→</span>
+              <div class="disk-block filled">3</div><span>→</span>
+              <div class="disk-block filled">7</div><span>→</span>
+              <div class="disk-block eof">Fin</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section solution-section" id="solucion" aria-labelledby="sol-title">
+      <div class="section-header">
+        <span class="section-num">07</span>
+        <h2 id="sol-title">Nuestra solución final</h2>
+        <p class="section-hint">Lo que proponemos para la biblioteca y por qué</p>
+      </div>
+
+      <div class="solution-duo">
+        <article class="solution-card" data-animate>
+          <div class="solution-icon">🌳</div>
+          <h3>Árbol B+ para organizar el catálogo</h3>
+          <ul>
+            <li>Búsquedas rápidas por ISBN (5 000 al día)</li>
+            <li>También por autor y título (2 000 al día)</li>
+            <li>Listado alfabético mensual sin ordenar todo a mano</li>
+            <li>Los ~200 libros nuevos por semana se agregan sin rehacer el catálogo entero</li>
+          </ul>
+        </article>
+        <article class="solution-card" data-animate>
+          <div class="solution-icon">📇</div>
+          <h3>Asignación indexada con FAT en disco</h3>
+          <ul>
+            <li>Un índice indica en qué bloques está cada archivo</li>
+            <li>La FAT enlaza los bloques aunque no estén juntos</li>
+            <li>Se encuentra la información sin recorrer toda la cadena</li>
+            <li>El disco puede crecer sin mover todos los archivos</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="architecture-flow" data-animate>
+        <h3>¿Cómo funciona todo junto?</h3>
+        <div class="flow-steps">
+          <div class="flow-step">
+            <span class="flow-num">1</span>
+            <p>El usuario busca por ISBN, autor o título</p>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <span class="flow-num">2</span>
+            <p>El árbol B+ encuentra el dato en el catálogo</p>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <span class="flow-num">3</span>
+            <p>El sistema sabe en qué bloque del disco está guardado</p>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <span class="flow-num">4</span>
+            <p>El índice y la FAT recuperan ese bloque rápido</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="section-summary gold" data-animate>
+        El árbol B+ resuelve <em>cómo encontrar</em> los libros en el catálogo.
+        La asignación indexada con FAT resuelve <em>cómo guardarlos</em> en el disco.
+        Las dos cosas juntas dan un sistema rápido, ordenado y preparado para seguir creciendo.
+      </p>
+    </section>
+
+    <section class="section section-alt" id="conclusiones" aria-labelledby="conclusiones-title">
+      <div class="section-header">
+        <span class="section-num">08</span>
+        <h2 id="conclusiones-title">Conclusiones</h2>
+        <p class="section-hint">Qué gana la Biblioteca Universitaria Central con esta propuesta</p>
+      </div>
+
+      <div class="conclusion-grid">
+        <article class="conc-card" data-animate>
+          <span>⚡</span>
+          <h3>Mejor rendimiento</h3>
+          <p>Las búsquedas no dependen de revisar medio millón de registros uno por uno.</p>
+        </article>
+        <article class="conc-card" data-animate>
+          <span>🎯</span>
+          <h3>Más eficiencia</h3>
+          <p>Menos espera para estudiantes y personal, sobre todo en horas con mucha afluencia.</p>
+        </article>
+        <article class="conc-card" data-animate>
+          <span>📈</span>
+          <h3>Listo para crecer</h3>
+          <p>El catálogo puede seguir aumentando sin que el sistema se quede corto.</p>
+        </article>
+        <article class="conc-card" data-animate>
+          <span>🚀</span>
+          <h3>Más velocidad</h3>
+          <p>Préstamos por ISBN al momento y listados alfabéticos sin trabajo extra cada mes.</p>
+        </article>
+        <article class="conc-card" data-animate>
+          <span>🌱</span>
+          <h3>Fácil de mantener</h3>
+          <p>Libros nuevos cada semana sin tener que rediseñar todo desde cero.</p>
+        </article>
+      </div>
+
+      <footer class="site-footer">
+        <p>Edwin Yair Molina Cerón · ID 408873</p>
+        <p>Sistemas Operativos — Proyecto Final · Sistema de Ficheros</p>
+        <p class="footer-sub">Biblioteca Universitaria Central</p>
+      </footer>
+    </section>
+  </main>
+
+  <button class="back-top" id="backTop" type="button" aria-label="Volver arriba">↑</button>
+
+  <script src="app.js"></script>
+</body>
+</html>
